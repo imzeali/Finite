@@ -1,5 +1,5 @@
 {
-    "name":        "yohang/finite",
+    "name":        "zeali/finite",
     "description": "A simple PHP5.3+ Finite State Machine",
     "keywords":    ["statemachine", "workflow", "state", "transition", "symfony", "bundle"],
     "homepage":    "https://github.com/yohang/Finite",
