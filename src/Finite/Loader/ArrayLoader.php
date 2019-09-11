@@ -36,8 +36,8 @@ class ArrayLoader implements LoaderInterface
     private $callbackBuilderFactory;
 
     /**
-     * @param array                           $config
-     * @param CallbackHandler                 $handler
+     * @param array $config
+     * @param CallbackHandler $handler
      * @param CallbackBuilderFactoryInterface $callbackBuilderFactory
      */
     public function __construct(array $config, CallbackHandler $handler = null, CallbackBuilderFactoryInterface $callbackBuilderFactory = null)
@@ -96,7 +96,7 @@ class ArrayLoader implements LoaderInterface
     private function loadStates(StateMachineInterface $stateMachine)
     {
         $resolver = new OptionsResolver();
-        $resolver->setDefaults(array('type' => StateInterface::TYPE_NORMAL, 'properties' => array()));
+        $resolver->setDefaults(array('type' => StateInterface::TYPE_NORMAL, 'properties' => array(), 'name' => '', 'color' => ''));
         $resolver->setAllowedValues('type', array(
             StateInterface::TYPE_INITIAL,
             StateInterface::TYPE_NORMAL,
@@ -116,12 +116,16 @@ class ArrayLoader implements LoaderInterface
     {
         $resolver = new OptionsResolver();
         $resolver->setRequired(array('from', 'to'));
-        $resolver->setDefaults(array('guard' => null, 'configure_properties' => null, 'properties' => array()));
+        $resolver->setDefaults(array('guard' => null, 'configure_properties' => null, 'properties' => array(), 'name' => null, 'hide' => false));
 
         $resolver->setAllowedTypes('configure_properties', array('null', 'callable'));
 
-        $resolver->setNormalizer('from', function (Options $options, $v) { return (array) $v; });
-        $resolver->setNormalizer('guard', function (Options $options, $v) { return !isset($v) ? null : $v; });
+        $resolver->setNormalizer('from', function (Options $options, $v) {
+            return (array)$v;
+        });
+        $resolver->setNormalizer('guard', function (Options $options, $v) {
+            return !isset($v) ? null : $v;
+        });
         $resolver->setNormalizer('configure_properties', function (Options $options, $v) {
             $resolver = new OptionsResolver();
 
@@ -168,7 +172,7 @@ class ArrayLoader implements LoaderInterface
             return;
         }
 
-        $method = 'add'.ucfirst($position);
+        $method = 'add' . ucfirst($position);
         $resolver = $this->getCallbacksResolver();
         foreach ($this->config['callbacks'][$position] as $specs) {
             $specs = $resolver->resolve($specs);
@@ -198,16 +202,16 @@ class ArrayLoader implements LoaderInterface
 
         $resolver->setRequired(array('do'));
 
-        $resolver->setAllowedTypes('on',   array('string', 'array'));
+        $resolver->setAllowedTypes('on', array('string', 'array'));
         $resolver->setAllowedTypes('from', array('string', 'array'));
-        $resolver->setAllowedTypes('to',   array('string', 'array'));
+        $resolver->setAllowedTypes('to', array('string', 'array'));
 
         $toArrayNormalizer = function (Options $options, $value) {
-            return (array) $value;
+            return (array)$value;
         };
-        $resolver->setNormalizer('on',  $toArrayNormalizer);
+        $resolver->setNormalizer('on', $toArrayNormalizer);
         $resolver->setNormalizer('from', $toArrayNormalizer);
-        $resolver->setNormalizer('to',   $toArrayNormalizer);
+        $resolver->setNormalizer('to', $toArrayNormalizer);
 
         return $resolver;
     }
