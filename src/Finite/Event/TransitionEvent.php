@@ -51,7 +51,7 @@ class TransitionEvent extends StateMachineEvent
         $this->properties = $properties;
 
         if ($transition instanceof PropertiesAwareTransitionInterface) {
-            $this->properties = $transition->resolveProperties($properties);
+            $this->properties = $properties;
         }
 
         parent::__construct($stateMachine);
