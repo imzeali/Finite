@@ -66,15 +66,16 @@ class StateMachine implements StateMachineInterface
     protected $graph;
 
     /**
-     * @param object                   $object
+     * @param object $object
      * @param EventDispatcherInterface $dispatcher
-     * @param StateAccessorInterface   $stateAccessor
+     * @param StateAccessorInterface $stateAccessor
      */
     public function __construct(
         $object = null,
         EventDispatcherInterface $dispatcher = null,
         StateAccessorInterface $stateAccessor = null
-    ) {
+    )
+    {
         $this->object = $object;
         $this->dispatcher = $dispatcher ?: new EventDispatcher();
         $this->stateAccessor = $stateAccessor ?: new PropertyPathStateAccessor();
@@ -93,7 +94,7 @@ class StateMachine implements StateMachineInterface
             $initialState = $this->stateAccessor->getState($this->object);
         } catch (Exception\NoSuchPropertyException $e) {
             throw new Exception\ObjectException(sprintf(
-               'StateMachine can\'t be initialized because the defined property_path of object "%s" does not exist.',
+                'StateMachine can\'t be initialized because the defined property_path of object "%s" does not exist.',
                 get_class($this->object)
             ), $e->getCode(), $e);
         }
@@ -102,12 +103,12 @@ class StateMachine implements StateMachineInterface
             $initialState = $this->findInitialState();
             $this->stateAccessor->setState($this->object, $initialState);
 
-            $this->dispatcher->dispatch(FiniteEvents::SET_INITIAL_STATE, new StateMachineEvent($this));
+            $this->dispatcher->dispatch(new StateMachineEvent($this), FiniteEvents::SET_INITIAL_STATE);
         }
 
         $this->currentState = $this->getState($initialState);
 
-        $this->dispatcher->dispatch(FiniteEvents::INITIALIZE, new StateMachineEvent($this));
+        $this->dispatcher->dispatch(new StateMachineEvent($this), FiniteEvents::INITIALIZE);
     }
 
     /**
@@ -180,7 +181,7 @@ class StateMachine implements StateMachineInterface
     {
         if ((null === $initialState || null === $finalState) && !$transition instanceof TransitionInterface) {
             throw new \InvalidArgumentException(
-                'You must provide a TransitionInterface instance or the $transition, '.
+                'You must provide a TransitionInterface instance or the $transition, ' .
                 '$initialState and $finalState parameters'
             );
         }
@@ -236,7 +237,7 @@ class StateMachine implements StateMachineInterface
      */
     public function getState($name)
     {
-        $name = (string) $name;
+        $name = (string)$name;
 
         if (!isset($this->states[$name])) {
             throw new Exception\StateException(sprintf(
@@ -397,10 +398,10 @@ class StateMachine implements StateMachineInterface
      */
     private function dispatchTransitionEvent(TransitionInterface $transition, TransitionEvent $event, $transitionState)
     {
-        $this->dispatcher->dispatch($transitionState, $event);
-        $this->dispatcher->dispatch($transitionState.'.'.$transition->getName(), $event);
+        $this->dispatcher->dispatch($event, $transitionState);
+        $this->dispatcher->dispatch($event, $transitionState . '.' . $transition->getName());
         if (null !== $this->getGraph()) {
-            $this->dispatcher->dispatch($transitionState.'.'.$this->getGraph().'.'.$transition->getName(), $event);
+            $this->dispatcher->dispatch($event, $transitionState . '.' . $this->getGraph() . '.' . $transition->getName());
         }
     }
 }
