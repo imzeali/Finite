@@ -133,8 +133,14 @@ class StateMachine implements StateMachineInterface
         $this->dispatchTransitionEvent($transition, $event, FiniteEvents::PRE_TRANSITION);
 
         $returnValue = $transition->process($this);
-        $this->stateAccessor->setState($this->object, $transition->getState());
-        $this->currentState = $this->getState($transition->getState());
+
+        if ($transition->getState() === '=') {
+            $this->stateAccessor->setState($this->object, $this->currentState);
+            $this->currentState = $this->currentState->getName();
+        } else {
+            $this->stateAccessor->setState($this->object, $transition->getState());
+            $this->currentState = $this->getState($transition->getState());
+        }
 
         $this->dispatchTransitionEvent($transition, $event, FiniteEvents::POST_TRANSITION);
 
@@ -151,10 +157,14 @@ class StateMachine implements StateMachineInterface
         if (null !== $transition->getGuard() && !call_user_func($transition->getGuard(), $this)) {
             return false;
         }
+        if (in_array('*', $transition->getInitialStates())) {
+            return true;
+        }
 
         if (!in_array($transition->getName(), $this->getCurrentState()->getTransitions())) {
             return false;
         }
+
 
         $event = new TransitionEvent($this->getCurrentState(), $transition, $this, $parameters);
         $this->dispatchTransitionEvent($transition, $event, FiniteEvents::TEST_TRANSITION);
