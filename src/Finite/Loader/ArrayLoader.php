@@ -96,7 +96,13 @@ class ArrayLoader implements LoaderInterface
     private function loadStates(StateMachineInterface $stateMachine)
     {
         $resolver = new OptionsResolver();
-        $resolver->setDefaults(array('type' => StateInterface::TYPE_NORMAL, 'properties' => array(), 'name' => '', 'color' => ''));
+        $resolver->setDefaults(array(
+            'type' => StateInterface::TYPE_NORMAL,
+            'properties' => array(),
+            'name' => '',
+            'color' => '',
+            'loading' => false
+        ));
         $resolver->setAllowedValues('type', array(
             StateInterface::TYPE_INITIAL,
             StateInterface::TYPE_NORMAL,
