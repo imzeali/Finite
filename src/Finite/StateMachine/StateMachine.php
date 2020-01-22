@@ -135,8 +135,8 @@ class StateMachine implements StateMachineInterface
         $returnValue = $transition->process($this);
 
         if ($transition->getState() === '=') {
-            $this->stateAccessor->setState($this->object, $this->currentState);
-            $this->currentState = $this->currentState->getName();
+            $this->stateAccessor->setState($this->object, $this->currentState->getName());
+            $this->currentState = $this->getState($this->currentState->getName());
         } else {
             $this->stateAccessor->setState($this->object, $transition->getState());
             $this->currentState = $this->getState($transition->getState());
